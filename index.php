@@ -29,8 +29,10 @@ $use_auth = true;
 // Users: array('Username' => 'Password', 'Username2' => 'Password2', ...)
 // Generate secure password hash - https://tinyfilemanager.github.io/docs/pwd.html
 $auth_users = array(
-    'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', //admin@123
-    'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO', //12345
+    // 'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', // admin@123
+    'admin' => '$2y$10$Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLykEO1t.Yu',
+    // 'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO', // 12345
+    'user' => '$2y$10$uAHabl1B2YAS7/XpcmJkn.jhnmhM25fJU/FRxQ1tjwxOh3kRvXCpm',
 );
 
 // Readonly users
@@ -173,7 +175,7 @@ if (is_readable($config_file)) {
 // lấy nội dung file hiện tại
 $admin_generator_password = file_get_contents(__FILE__);
 // nếu mật khẩu vẫn là mật khẩu mặc định
-if (strpos($auth_users['admin'], 'mGwrrLuCZfAwfSAGqhOW') !== false) {
+if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLykEO1t') !== false) {
     function generateRandomString($length = 20)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
