@@ -3771,7 +3771,7 @@ function fm_show_nav_path($path)
 
             <?php
             $path = fm_clean_path($path);
-            $root_url = "<a href='?p='><i class='fa fa-home' aria-hidden='true' title='" . FM_ROOT_PATH . "'></i></a>";
+            $root_url = "<a href='?p='><i class='fa fa-home' aria-hidden='true' title='" . FM_ROOT_PATH . "'></i> Home</a>";
             $sep = '<i class="bread-crumb"> / </i>';
             if ($path != '') {
                 $exploded = explode('/', $path);
@@ -4129,6 +4129,10 @@ function fm_show_header_login()
 
             #main-table .filename a {
                 color: #222222;
+            }
+
+            .d-block {
+                display: block;
             }
 
             .table td,
