@@ -2,6 +2,7 @@
 
 /**
  * File config mẫu -> dùng khi tạo mật khẩu ngẫu nhiên
+ * Generate secure password hash - https://tinyfilemanager.github.io/docs/pwd.html
  */
 
 // nếu ko có tham số này -> ko cho truy cập trực tiếp
