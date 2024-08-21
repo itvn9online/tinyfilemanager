@@ -8,3 +8,6 @@
 if (!defined('APP_TITLE')) {
     die('No money no love!');
 }
+
+// gán lại biến auth_users -> xóa các thông tin config trước đó nếu có
+$auth_users = [];

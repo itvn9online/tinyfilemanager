@@ -182,12 +182,15 @@ if (strpos($auth_users['admin'], 'mGwrrLuCZfAwfSAGqhOW') !== false) {
         return $randomString;
     }
 
+    // kiểm tra file config mẫu
+    if (filesize(__DIR__ . '/config-sample.php') < 1) {
+        die('config-sample is EMPTY...');
+    }
+
     // copy file config từ config mẫu
     copy(__DIR__ . '/config-sample.php', $config_file);
     // thêm 1 dòng trống
     file_put_contents($config_file, PHP_EOL, FILE_APPEND);
-    // gán lại biến auth_users -> xóa các thông tin config trước đó nếu có
-    file_put_contents($config_file, '$auth_users = [];' . PHP_EOL, FILE_APPEND);
 
     // tạo mk ngẫu nhiên cho admin
     $random_string = generateRandomString();
@@ -200,7 +203,9 @@ if (strpos($auth_users['admin'], 'mGwrrLuCZfAwfSAGqhOW') !== false) {
     file_put_contents($config_file, '$auth_users[\'user\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
 
     // 
-    die('Reload this page for continue...');
+    sleep(1);
+    header("Refresh:0");
+    die('Waiting this page reload...');
 }
 
 // External CDN resources that can be used in the HTML (replace for GDPR compliance)
