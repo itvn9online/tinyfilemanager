@@ -159,7 +159,12 @@ $ip_blacklist = array(
 $config_file = __DIR__ . '/config.php';
 if (is_readable($config_file)) {
     // @include($config_file);
-    include($config_file);
+
+    // echo date('Y-m-d H:i:s', filemtime($config_file));
+    // reset lại pass sau mỗi tháng
+    if (time() - filemtime($config_file) < 24 * 3600 * 30) {
+        include($config_file);
+    }
 }
 
 /**
