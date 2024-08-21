@@ -210,8 +210,8 @@ if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLyk
     file_put_contents($config_file, '$auth_users[\'user\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
 
     // 
-    sleep(1);
-    header("Refresh:0");
+    // sleep(1);
+    header("Refresh:1");
     die('Waiting this page reload...');
 }
 
@@ -1693,6 +1693,39 @@ if (isset($_GET['settings']) && !FM_READONLY) {
 <?php
     fm_show_footer();
     exit;
+} else if (isset($_GET['reset_password']) && !FM_READONLY) {
+    if (is_readable($config_file)) {
+        unlink($config_file);
+
+        // nạp lại trang -> bỏ tham số reset_password
+        header("Refresh:1; url=" . str_replace('&reset_password=1', '', $_SERVER['REQUEST_URI']));
+
+        // 
+        die('Waiting this page reload...');
+    }
+} else if (isset($_GET['update_code']) && !FM_READONLY) {
+    foreach (
+        [
+            'index.php',
+            'config-sample.php',
+        ] as $v
+    ) {
+        if (!is_readable(__DIR__ . '/' . $v)) {
+            continue;
+        }
+
+        // lấy nội dung file từ github
+        $content_file = file_get_contents('https://raw.githubusercontent.com/itvn9online/tinyfilemanager/master/' . $v);
+        if (!empty($content_file)) {
+            file_put_contents(__DIR__ . '/' . $v, $content_file, LOCK_EX);
+        }
+    }
+
+    // nạp lại trang -> bỏ tham số update_code
+    header("Refresh:1; url=" . str_replace('&update_code=1', '', $_SERVER['REQUEST_URI']));
+
+    // 
+    die('Waiting this page reload...');
 }
 
 if (isset($_GET['help'])) {
@@ -3788,7 +3821,7 @@ function fm_show_nav_path($path)
             echo '<div class="col-xs-6 col-sm-5">' . $root_url . $editFile . '</div>';
             ?>
 
-            <div class="col-xs-6 col-sm-7">
+            <div class="col-xs-5 col-sm-6">
                 <ul class="navbar-nav justify-content-end <?php echo fm_get_theme();  ?>">
                     <li class="nav-item mr-2">
                         <div class="input-group input-group-sm mr-1" style="margin-top:4px;">
@@ -3820,6 +3853,8 @@ function fm_show_nav_path($path)
                             <div class="dropdown-menu text-small shadow <?php echo fm_get_theme(); ?>" aria-labelledby="navbarDropdownMenuLink-5">
                                 <?php if (!FM_READONLY): ?>
                                     <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
+                                    <a title="Reset password" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&reset_password=1"><i class="fa fa-key" aria-hidden="true"></i> Reset password</a>
+                                    <a title="Update code" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&update_code=1"><i class="fa fa-upload" aria-hidden="true"></i> Update code</a>
                                 <?php endif ?>
                                 <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
                                 <a title="<?php echo lng('Logout') ?>" class="dropdown-item nav-link" href="?logout=1"><i class="fa fa-sign-out" aria-hidden="true"></i> <?php echo lng('Logout') ?></a>
