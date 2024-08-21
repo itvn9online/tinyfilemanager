@@ -186,6 +186,8 @@ if (strpos($auth_users['admin'], 'mGwrrLuCZfAwfSAGqhOW') !== false) {
     copy(__DIR__ . '/config-sample.php', $config_file);
     // thêm 1 dòng trống
     file_put_contents($config_file, PHP_EOL, FILE_APPEND);
+    // gán lại biến auth_users -> xóa các thông tin config trước đó nếu có
+    file_put_contents($config_file, '$auth_users = [];' . PHP_EOL, FILE_APPEND);
 
     // tạo mk ngẫu nhiên cho admin
     $random_string = generateRandomString();
@@ -193,7 +195,7 @@ if (strpos($auth_users['admin'], 'mGwrrLuCZfAwfSAGqhOW') !== false) {
     file_put_contents($config_file, '$auth_users[\'admin\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
 
     // tạo mk ngẫu nhiên cho user
-    $random_string = generateRandomString();
+    $random_string = generateRandomString(32);
     file_put_contents($config_file, '// ' . $random_string . PHP_EOL, FILE_APPEND);
     file_put_contents($config_file, '$auth_users[\'user\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
 
@@ -3749,7 +3751,7 @@ function fm_show_nav_path($path)
     }
 ?>
     <nav class="navbar navbar-expand-lg <?php echo $getTheme; ?> mb-4 main-nav <?php echo $isStickyNavBar ?>">
-        <a class="navbar-brand"> <?php echo lng('AppTitle') ?> </a>
+        <a class="navbar-brand" href="?p="> <?php echo lng('AppTitle') ?> </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
