@@ -3858,7 +3858,7 @@ function fm_show_nav_path($path)
                             <div class="dropdown-menu text-small shadow <?php echo fm_get_theme(); ?>" aria-labelledby="navbarDropdownMenuLink-5">
                                 <?php if (!FM_READONLY): ?>
                                     <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
-                                    <a title="Reset password" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&reset_password=1"><i class="fa fa-key" aria-hidden="true"></i> Reset password</a>
+                                    <a title="Generate password" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&reset_password=1"><i class="fa fa-key" aria-hidden="true"></i> Generate password</a>
                                     <a title="Update code" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&update_code=1"><i class="fa fa-upload" aria-hidden="true"></i> Update code</a>
                                 <?php endif ?>
                                 <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
