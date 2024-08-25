@@ -211,8 +211,8 @@ if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLyk
 
     // 
     // sleep(1);
-    header("Refresh:1");
-    die('Waiting this page reload...');
+    header("Refresh:3");
+    die('Config created... Waiting this page reload...');
 }
 
 // External CDN resources that can be used in the HTML (replace for GDPR compliance)
@@ -1701,7 +1701,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
         header("Refresh:1; url=" . str_replace('&reset_password=1', '', $_SERVER['REQUEST_URI']));
 
         // 
-        die('Waiting this page reload...');
+        die('Config removed... Waiting this page reload...');
     }
 } else if (isset($_GET['update_code']) && !FM_READONLY) {
     foreach (
@@ -1725,7 +1725,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
     header("Refresh:1; url=" . str_replace('&update_code=1', '', $_SERVER['REQUEST_URI']));
 
     // 
-    die('Waiting this page reload...');
+    die('Updated... Waiting this page reload...');
 }
 
 if (isset($_GET['help'])) {
