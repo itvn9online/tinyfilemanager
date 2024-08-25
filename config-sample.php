@@ -10,5 +10,10 @@ if (!defined('APP_TITLE')) {
     die('No money no love!');
 }
 
-// gán lại biến auth_users -> xóa các thông tin config trước đó nếu có
-$auth_users = [];
+// gán lại giá trị cho biến auth_users -> xóa các thông tin config trước đó nếu có
+$auth_users = [
+    // {admin_password}
+    'admin' => '{admin_hash_password}',
+    // {user_password}
+    'user' => '{user_hash_password}',
+];

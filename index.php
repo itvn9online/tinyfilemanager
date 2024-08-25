@@ -30,9 +30,10 @@ $use_auth = true;
 // Generate secure password hash - https://tinyfilemanager.github.io/docs/pwd.html
 $auth_users = array(
     // 'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', // admin@123
-    'admin' => '$2y$10$Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLykEO1t.Yu',
+    // mặc định gán chuỗi linh tinh -> không theo quy chuẩn của hàm kiểm tra mật khẩu -> không thể đăng nhập đúng được
+    'admin' => '3KTM9OS7bp8N6FQY.obLtw6gapxSBDOMxF4sTdn0FmaMbPe.LE5dFjrn8DFn3F85XIhv4B0vq',
     // 'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO', // 12345
-    'user' => '$2y$10$uAHabl1B2YAS7/XpcmJkn.jhnmhM25fJU/FRxQ1tjwxOh3kRvXCpm',
+    'user' => 'qSvOzG2HuXKhyMepdAjSaqts8R2.hwTq1AvJvdqu0.vKuwYoeQ6nHUd9dI05QgqeAjUh5N9s4wiR',
 );
 
 // Readonly users
@@ -175,7 +176,7 @@ if (is_readable($config_file)) {
 // lấy nội dung file hiện tại
 $admin_generator_password = file_get_contents(__FILE__);
 // nếu mật khẩu vẫn là mật khẩu mặc định
-if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLykEO1t') !== false) {
+if (strpos($auth_users['admin'], 'obLtw6gapxSBDOMxF4sTdn0FmaMbPe') !== false) {
     function generateRandomString($length = 20)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -194,20 +195,29 @@ if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLyk
         die('config-sample is EMPTY...');
     }
 
-    // copy file config từ config mẫu
-    copy(__DIR__ . '/config-sample.php', $config_file);
-    // thêm 1 dòng trống
-    file_put_contents($config_file, PHP_EOL, FILE_APPEND);
+    // tạo nội dung cho file config từ config-sample
+    $config_content = file_get_contents(__DIR__ . '/config-sample.php');
 
     // tạo mk ngẫu nhiên cho admin
-    $random_string = generateRandomString();
-    file_put_contents($config_file, '// ' . $random_string . PHP_EOL, FILE_APPEND);
-    file_put_contents($config_file, '$auth_users[\'admin\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
+    $admin_password = generateRandomString();
 
     // tạo mk ngẫu nhiên cho user
-    $random_string = generateRandomString(32);
-    file_put_contents($config_file, '// ' . $random_string . PHP_EOL, FILE_APPEND);
-    file_put_contents($config_file, '$auth_users[\'user\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
+    $user_password = generateRandomString(32);
+
+    // chạy vòng lặp thay thế dữ liệu trước khi tạo config
+    foreach (
+        [
+            'admin_password' => $admin_password,
+            'admin_hash_password' => password_hash($admin_password, PASSWORD_DEFAULT),
+            'user_password' => $user_password,
+            'user_hash_password' => password_hash($user_password, PASSWORD_DEFAULT),
+        ] as $k => $v
+    ) {
+        $config_content = str_replace('{' . $k . '}', $v, $config_content);
+    }
+
+    // xong việc thì tạo file thôi
+    file_put_contents($config_file, $config_content, LOCK_EX);
 
     // nạp lại trang
     header("Refresh:3");
