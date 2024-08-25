@@ -209,8 +209,7 @@ if (strpos($auth_users['admin'], 'Gt0GVK9OxU3EGR5sSAmVLeDxezzaJDksncHU2aORyBeLyk
     file_put_contents($config_file, '// ' . $random_string . PHP_EOL, FILE_APPEND);
     file_put_contents($config_file, '$auth_users[\'user\'] = \'' . password_hash($random_string, PASSWORD_DEFAULT) . '\';' . PHP_EOL, FILE_APPEND);
 
-    // 
-    // sleep(1);
+    // nạp lại trang
     header("Refresh:3");
     die('Config created... Waiting this page reload...');
 }
@@ -1698,9 +1697,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
         unlink($config_file);
 
         // nạp lại trang -> bỏ tham số reset_password
-        header("Refresh:1; url=" . str_replace('&reset_password=1', '', $_SERVER['REQUEST_URI']));
-
-        // 
+        header("Refresh:3; url=" . str_replace('&reset_password=1', '', $_SERVER['REQUEST_URI']));
         die('Config removed... Waiting this page reload...');
     }
 } else if (isset($_GET['update_code']) && !FM_READONLY) {
@@ -1722,9 +1719,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
     }
 
     // nạp lại trang -> bỏ tham số update_code
-    header("Refresh:1; url=" . str_replace('&update_code=1', '', $_SERVER['REQUEST_URI']));
-
-    // 
+    header("Refresh:3; url=" . str_replace('&update_code=1', '', $_SERVER['REQUEST_URI']));
     die('Updated... Waiting this page reload...');
 }
 
