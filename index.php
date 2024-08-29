@@ -2078,8 +2078,17 @@ if (isset($_GET['edit']) && !FM_READONLY) {
         </div>
         <?php
         if ($is_text && $isNormalEditor) {
-            echo '<textarea class="mt-2" id="normal-editor" rows="33" cols="120" style="width: 99.5%;">' . htmlspecialchars($content) . '</textarea>';
-            echo '<script>document.addEventListener("keydown", function(e) {if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) { e.preventDefault();edit_save(this,"nrl");}}, false);</script>';
+        ?>
+            <textarea class="mt-2" id="normal-editor" rows="33" cols="120" style="width: 99.5%;"><?php echo htmlspecialchars($content); ?></textarea>
+            <script>
+                document.addEventListener("keydown", function(e) {
+                    if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) && e.keyCode == 83) {
+                        e.preventDefault();
+                        edit_save(this, "nrl");
+                    }
+                }, false);
+            </script>
+        <?php
         } elseif ($is_text) {
             echo '<div id="editor" contenteditable="true">' . htmlspecialchars($content) . '</div>';
         } else {
@@ -2087,8 +2096,20 @@ if (isset($_GET['edit']) && !FM_READONLY) {
         }
         ?>
     </div>
-<?php
+    <?php
     fm_show_footer();
+    ?>
+    <script>
+        function normal_editor_height() {
+            let a = jQuery(window).height() - 150;
+            jQuery('#normal-editor').height(a < 250 ? 250 : a);
+        }
+        jQuery(window).resize(function() {
+            normal_editor_height();
+        });
+        normal_editor_height();
+    </script>
+<?php
     exit;
 }
 
