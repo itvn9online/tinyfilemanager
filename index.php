@@ -1795,10 +1795,20 @@ if (isset($_GET['view'])) {
     $file = $_GET['view'];
     $file = fm_clean_path($file, false);
     $file = str_replace('/', '', $file);
+
+    // 
     if ($file == '' || !is_file($path . '/' . $file) || !fm_is_exclude_items($file)) {
         fm_set_msg(lng('File not found'), 'error');
         $FM_PATH = FM_PATH;
         fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+    } else if (in_array($file, [
+        '.user.ini',
+    ])) {
+        // nếu file không tồn tại hoặc không phải là file hoặc không phải là file được phép xem
+        fm_set_msg(lng('File not view'), 'error');
+        $FM_PATH = FM_PATH;
+        fm_redirect(FM_SELF_URL . '?p=' . urlencode($FM_PATH));
+        die(basename(__FILE__) . ':' . __LINE__ . ':' . $file);
     }
 
     fm_show_header(); // HEADER
