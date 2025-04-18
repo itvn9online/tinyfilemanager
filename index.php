@@ -72,7 +72,7 @@ $default_timezone = 'Etc/UTC'; // UTC
  */
 $root_path = dirname(__DIR__);
 $root_index_path = $root_path . '/index.php';
-if (!is_file($root_index_path)) {
+if (!is_file($root_index_path) && !is_file($root_path . '/.user.ini')) {
     die('index file by dirname not found!');
 }
 // die($root_index_path);
