@@ -16,7 +16,7 @@ if (!defined('APP_TITLE')) {
  */
 // Kiểm tra và tạo cookie truy cập
 $echbay_allowed = false;
-$echbay_cookie_name = 'echbay_phpmyadmin_access_token';
+$echbay_cookie_name = 'eb_' . md5($_SERVER['HTTP_HOST']) . '_access_token';
 
 if (
     isset($_SERVER['HTTP_REFERER']) &&
