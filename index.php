@@ -7,7 +7,28 @@ $CONFIG = '{"lang":"en","error_reporting":false,"show_hidden":true,"hide_Cols":f
  * @author CCP Programmers
  * @github https://github.com/prasathmani/tinyfilemanager
  * @link https://tinyfilemanager.github.io
+ * 
+ * @github https://github.com/itvn9online/tinyfilemanager
+ * 
  */
+
+// TFM version
+if (is_file(__DIR__ . '/VERSION')) {
+    define('TMF_VERSION', file_get_contents(__DIR__ . '/VERSION'));
+} else {
+    $content_file = file_get_contents('https://raw.githubusercontent.com/itvn9online/tinyfilemanager/master/VERSION');
+    if (!empty($content_file)) {
+        file_put_contents(__DIR__ . '/VERSION', $content_file, LOCK_EX);
+        define('TMF_VERSION', $content_file);
+    } else {
+        define('TMF_VERSION', date('Y.m.d'));
+    }
+}
+
+// Application Title
+define('APP_TITLE', 'Tiny File Manager');
+
+// --- EDIT BELOW CONFIGURATION CAREFULLY ---
 
 /**
  * Kiểm tra bảo mật đầu vào, phải thông qua link giới thiệu từ echbay.com mới cho phép truy cập
@@ -37,14 +58,6 @@ if (!$echbay_allowed) {
     header('HTTP/1.1 403 Forbidden');
     exit('Permission denny by cloud echbay!');
 }
-
-//TFM version
-define('VERSION', '2.5.3');
-
-//Application Title
-define('APP_TITLE', 'Tiny File Manager');
-
-// --- EDIT BELOW CONFIGURATION CAREFULLY ---
 
 // Auth with login/password
 // set true/false to enable/disable it
@@ -495,7 +508,7 @@ if ($use_auth) {
                         </div>
                         <div class="footer text-center">
                             &mdash;&mdash; &copy;
-                            <a href="https://tinyfilemanager.github.io/" target="_blank" class="text-decoration-none text-muted" data-version="<?php echo VERSION; ?>">CCP Programmers</a> &mdash;&mdash;
+                            <a href="https://tinyfilemanager.github.io/" target="_blank" class="text-decoration-none text-muted" data-version="<?php echo TMF_VERSION; ?>">CCP Programmers</a> &mdash;&mdash;
                         </div>
                     </div>
                 </div>
@@ -1741,6 +1754,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
         [
             'index.php',
             'config-sample.php',
+            'VERSION',
         ] as $v
     ) {
         if (!is_readable(__DIR__ . '/' . $v)) {
@@ -1775,7 +1789,7 @@ if (isset($_GET['help'])) {
                 <div class="row">
                     <div class="col-xs-12 col-sm-6">
                         <p>
-                        <h3><a href="https://github.com/prasathmani/tinyfilemanager" target="_blank" class="app-v-title"> Tiny File Manager <?php echo VERSION; ?></a></h3>
+                        <h3><a href="https://github.com/prasathmani/tinyfilemanager" target="_blank" class="app-v-title"> Tiny File Manager <?php echo TMF_VERSION; ?></a></h3>
                         </p>
                         <p>Author: Prasath Mani</p>
                         <p>Mail Us: <a href="mailto:ccpprogrammers@gmail.com">ccpprogrammers[at]gmail.com</a> </p>
@@ -2449,9 +2463,9 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                     </li>
                 </ul>
             </div>
-            <div class="col-3 d-none d-sm-block"><a href="https://tinyfilemanager.github.io" target="_blank" class="float-right text-muted">Tiny File Manager <?php echo VERSION; ?></a></div>
+            <div class="col-3 d-none d-sm-block"><a href="https://tinyfilemanager.github.io" target="_blank" class="float-right text-muted">Tiny File Manager <?php echo TMF_VERSION; ?></a></div>
         <?php else: ?>
-            <div class="col-12"><a href="https://tinyfilemanager.github.io" target="_blank" class="float-right text-muted">Tiny File Manager <?php echo VERSION; ?></a></div>
+            <div class="col-12"><a href="https://tinyfilemanager.github.io" target="_blank" class="float-right text-muted">Tiny File Manager <?php echo TMF_VERSION; ?></a></div>
         <?php endif; ?>
     </div>
 </form>
