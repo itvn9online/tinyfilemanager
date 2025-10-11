@@ -68,8 +68,9 @@ else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'word
             // $echbay_allowed = true;
             // tải lại trang để tránh bị lặp lại đoạn code trên
             header("Location: " . $_SERVER['REQUEST_URI']);
-            exit;
         }
+        echo 'Permission denied by wordpress!';
+        exit;
     }
 }
 // nếu là phương thức POST
