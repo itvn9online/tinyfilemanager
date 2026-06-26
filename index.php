@@ -35,23 +35,27 @@ define('APP_TITLE', 'Tiny File Manager');
  * Đoạn có này sẽ sử dụng cho file index của tinyfilemanager và config của phpmyadmin
  */
 // Kiểm tra và tạo cookie truy cập
-$echbay_allowed = false;
+$echbay_allowed = 0;
 $echbay_cookie_name = 'eb_' . md5($_SERVER['HTTP_HOST']) . '_access_token';
 
-if (
+// TEST
+// print_r($_SERVER);
+
+// Nếu đã có cookie truy cập thì cũng cho phép
+if (isset($_COOKIE[$echbay_cookie_name])) {
+    $echbay_allowed = __LINE__;
+}
+// Nếu nguồn giới thiệu là từ hệ thống của echbay
+else if (
     isset($_SERVER['HTTP_REFERER']) &&
     (
         strpos($_SERVER['HTTP_REFERER'], 'echbay.com') !== false ||
         strpos($_SERVER['HTTP_REFERER'], 'cloud.echbay.com') !== false
     )
 ) {
-    // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86400, 12 tiếng = 43200
-    setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43200, "/");
-    $echbay_allowed = true;
-}
-// Nếu đã có cookie truy cập thì cũng cho phép
-else if (isset($_COOKIE[$echbay_cookie_name])) {
-    $echbay_allowed = true;
+    // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
+    setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+    $echbay_allowed = __LINE__;
 }
 // nếu có cookie của wordpress thì cũng cho phép
 else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'wordpress_logged_in_') !== false) {
@@ -63,9 +67,9 @@ else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'word
         // print_r($current_user);
         // nếu user hiện tại có quyền quản trị -> cho phép
         if (in_array('administrator', $current_user->roles)) {
-            // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86400, 12 tiếng = 43200
-            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43200, "/");
-            // $echbay_allowed = true;
+            // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
+            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+            // $echbay_allowed = __LINE__;
             // tải lại trang để tránh bị lặp lại đoạn code trên
             header("Location: " . $_SERVER['REQUEST_URI']);
         }
@@ -74,7 +78,7 @@ else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'word
     }
 }
 // nếu là phương thức POST
-else if (1 > 2 && $_SERVER['REQUEST_METHOD'] == 'POST') {
+else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (
         isset($_POST['from']) &&
         isset($_POST['to']) &&
@@ -84,15 +88,19 @@ else if (1 > 2 && $_SERVER['REQUEST_METHOD'] == 'POST') {
         ) &&
         $_POST['to'] == $_SERVER['HTTP_HOST']
     ) {
-        // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86400, 12 tiếng = 43200
-        setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43200, "/");
-        $echbay_allowed = true;
+        // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
+        setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+        $echbay_allowed = __LINE__;
+        // die(__FILE__ . ':' . __LINE__);
     }
 }
 
-if (!$echbay_allowed) {
-    header('HTTP/1.1 403 Forbidden');
+if ($echbay_allowed < 1) {
+    // header('HTTP/1.1 403 Forbidden');
     exit('Permission denied by cloud echbay!');
+    // } else {
+    //     print_r($_SERVER);
+    //     die(__FILE__ . ':' . __LINE__);
 }
 
 // Auth with login/password
