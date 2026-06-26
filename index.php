@@ -642,7 +642,11 @@ if ((isset($_SESSION[FM_SESSION_ID]['logged'], $auth_users[$_SESSION[FM_SESSION_
         if (!is_dir($path)) {
             fm_redirect(FM_SELF_URL . '?p=');
         }
-        $file = $_GET['edit'];
+        $file = fm_resolve_get_file('edit');
+        if ($file === null) {
+            header("HTTP/1.1 400 Bad Request");
+            die("File not specified.");
+        }
         $file = fm_clean_path($file);
         $file = str_replace('/', '', $file);
         if ($file == '' || !is_file($path . '/' . $file)) {
@@ -1875,8 +1879,8 @@ if (isset($_GET['help'])) {
 }
 
 // file viewer
-if (isset($_GET['view'])) {
-    $file = $_GET['view'];
+if (isset($_GET['view']) || isset($_GET['rv'])) {
+    $file = fm_resolve_get_file('view');
     $file = fm_clean_path($file, false);
     $file = str_replace('/', '', $file);
 
@@ -2011,9 +2015,9 @@ if (isset($_GET['view'])) {
                 }
                 if ($is_text && !FM_READONLY) {
                 ?>
-                    <b class="ms-2"><a href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>" class="edit-file"><i class="fa fa-pencil-square"></i> <?php echo lng('Edit') ?>
+                    <b class="ms-2"><a href="<?php echo fm_file_action_url(FM_PATH, $file, 'edit') ?>" class="edit-file"><i class="fa fa-pencil-square"></i> <?php echo lng('Edit') ?>
                         </a></b> &nbsp;
-                    <b class="ms-2"><a href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&env=ace"
+                    <b class="ms-2"><a href="<?php echo fm_file_action_url(FM_PATH, $file, 'edit') ?>&amp;env=ace"
                             class="edit-file"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?>
                         </a></b> &nbsp;
                 <?php } ?>
@@ -2084,8 +2088,8 @@ if (isset($_GET['view'])) {
 }
 
 // file editor
-if (isset($_GET['edit']) && !FM_READONLY) {
-    $file = $_GET['edit'];
+if ((isset($_GET['edit']) || isset($_GET['re'])) && !FM_READONLY) {
+    $file = fm_resolve_get_file('edit');
     $file = fm_clean_path($file, false);
     $file = str_replace('/', '', $file);
     if ($file == '' || !is_file($path . '/' . $file) || !fm_is_exclude_items($file)) {
@@ -2155,15 +2159,15 @@ if (isset($_GET['edit']) && !FM_READONLY) {
                 </div>
             </div>
             <div class="edit-file-actions col-xs-12 col-sm-7 col-lg-6 text-end pt-1">
-                <a title="<?php echo lng('Back') ?>" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;view=<?php echo urlencode($file) ?>"><i class="fa fa-reply-all"></i> <?php echo lng('Back') ?></a>
+                <a title="<?php echo lng('Back') ?>" class="btn btn-sm btn-outline-primary" href="<?php echo fm_file_action_url(FM_PATH, $file, 'view') ?>"><i class="fa fa-reply-all"></i> <?php echo lng('Back') ?></a>
                 <a title="<?php echo lng('BackUp') ?>" class="btn btn-sm btn-outline-primary" href="javascript:void(0);" onclick="backup('<?php echo urlencode(trim(FM_PATH)) ?>','<?php echo urlencode($file) ?>')"><i class="fa fa-database"></i> <?php echo lng('BackUp') ?></a>
                 <?php if ($is_text) { ?>
                     <?php if ($isNormalEditor) { ?>
-                        <a title="Advanced" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&amp;env=ace"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?></a>
+                        <a title="Advanced" class="btn btn-sm btn-outline-primary" href="<?php echo fm_file_action_url(FM_PATH, $file, 'edit') ?>&amp;env=ace"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?></a>
                         <button type="button" class="btn btn-sm btn-success" name="Save" data-url="<?php echo fm_enc($file_url) ?>" onclick="edit_save(this,'nrl')"><i class="fa fa-floppy-o"></i> Save
                         </button>
                     <?php } else { ?>
-                        <a title="Plain Editor" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>"><i class="fa fa-text-height"></i> <?php echo lng('NormalEditor') ?></a>
+                        <a title="Plain Editor" class="btn btn-sm btn-outline-primary" href="<?php echo fm_file_action_url(FM_PATH, $file, 'edit') ?>"><i class="fa fa-text-height"></i> <?php echo lng('NormalEditor') ?></a>
                         <button type="button" class="btn btn-sm btn-success" name="Save" data-url="<?php echo fm_enc($file_url) ?>" onclick="edit_save(this,'ace')"><i class="fa fa-floppy-o"></i> <?php echo lng('Save') ?>
                         </button>
                     <?php } ?>
@@ -2400,7 +2404,7 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 $date_sorting = strtotime(date("F d Y H:i:s.", $modif_raw));
                 $filesize_raw = fm_get_size($path . '/' . $f);
                 $filesize = fm_get_filesize($filesize_raw);
-                $filelink = '?p=' . urlencode(FM_PATH) . '&amp;view=' . urlencode($f);
+                $filelink = fm_file_action_url(FM_PATH, $f, 'view');
                 $all_files_size += $filesize_raw;
                 $perms = substr(decoct(fileperms($path . '/' . $f)), -4);
                 if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
@@ -3010,6 +3014,59 @@ function fm_get_zif_info($path, $ext)
 }
 
 /**
+ * Filenames that may trigger WAF rules when present in query strings (e.g. Cloudflare).
+ */
+function fm_waf_sensitive_files()
+{
+    return array('wp-config.php', 'wp-config-sample.php', '.env', '.htpasswd');
+}
+
+function fm_is_waf_sensitive_file($filename)
+{
+    return in_array(strtolower(basename($filename)), fm_waf_sensitive_files(), true);
+}
+
+function fm_encode_file_ref($filename)
+{
+    return rtrim(strtr(base64_encode($filename), '+/', '-_'), '=');
+}
+
+function fm_decode_file_ref($ref)
+{
+    $ref = strtr($ref, '-_', '+/');
+    $pad = strlen($ref) % 4;
+    if ($pad) {
+        $ref .= str_repeat('=', 4 - $pad);
+    }
+    $decoded = base64_decode($ref, true);
+    return $decoded !== false ? $decoded : '';
+}
+
+function fm_resolve_get_file($action)
+{
+    $encoded_key = ($action === 'view') ? 'rv' : 're';
+    if (isset($_GET[$encoded_key])) {
+        return fm_decode_file_ref($_GET[$encoded_key]);
+    }
+    if (isset($_GET[$action])) {
+        return $_GET[$action];
+    }
+    return null;
+}
+
+function fm_file_action_url($path, $filename, $action, $html = true)
+{
+    $sep = $html ? '&amp;' : '&';
+    $p = $path ? ltrim(trim($path), '/') : '';
+    $base = '?p=' . urlencode($p);
+    if (fm_is_waf_sensitive_file($filename)) {
+        $param = ($action === 'view') ? 'rv' : 're';
+        return $base . $sep . $param . '=' . urlencode(fm_encode_file_ref($filename));
+    }
+    return $base . $sep . $action . '=' . urlencode($filename);
+}
+
+/**
  * Encode html entities
  * @param string $text
  * @return string
@@ -3531,6 +3588,7 @@ function scan($dir = '', $filter = '')
                     "name" => $fileName,
                     "type" => "file",
                     "path" => $location,
+                    "view_url" => fm_file_action_url($location, $fileName, 'view', false),
                 );
             }
         }
@@ -4195,7 +4253,7 @@ function fm_show_header_login()
         <?php print_external('pre-cloudflare'); ?>
         <?php print_external('css-bootstrap'); ?>
         <?php print_external('css-font-awesome'); ?>
-        <?php if (FM_USE_HIGHLIGHTJS && isset($_GET['view'])): ?>
+        <?php if (FM_USE_HIGHLIGHTJS && (isset($_GET['view']) || isset($_GET['rv']))): ?>
             <?php print_external('css-highlightjs'); ?>
         <?php endif; ?>
         <script type="text/javascript">
@@ -5030,7 +5088,7 @@ function fm_show_header_login()
         <?php print_external('js-jquery'); ?>
         <?php print_external('js-bootstrap'); ?>
         <?php print_external('js-jquery-datatables'); ?>
-        <?php if (FM_USE_HIGHLIGHTJS && isset($_GET['view'])): ?>
+        <?php if (FM_USE_HIGHLIGHTJS && (isset($_GET['view']) || isset($_GET['rv']))): ?>
             <?php print_external('js-highlightjs'); ?>
             <script>
                 hljs.highlightAll();
@@ -5227,7 +5285,7 @@ function fm_show_header_login()
             function search_template(data) {
                 var response = "";
                 $.each(data, function(key, val) {
-                    response += `<li><a href="?p=${val.path}&view=${val.name}">${val.path}/${val.name}</a></li>`;
+                    response += `<li><a href="${val.view_url}">${val.path}/${val.name}</a></li>`;
                 });
                 return response;
             }
@@ -5364,9 +5422,9 @@ function fm_show_header_login()
                 });
             });
         </script>
-        <?php if (isset($_GET['edit']) && isset($_GET['env']) && FM_EDIT_FILE && !FM_READONLY):
+        <?php if ((isset($_GET['edit']) || isset($_GET['re'])) && isset($_GET['env']) && FM_EDIT_FILE && !FM_READONLY):
 
-            $ext = pathinfo($_GET["edit"], PATHINFO_EXTENSION);
+            $ext = pathinfo(fm_resolve_get_file('edit'), PATHINFO_EXTENSION);
             $ext =  $ext == "js" ? "javascript" :  $ext;
         ?>
             <?php print_external('js-ace'); ?>
