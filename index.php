@@ -41,66 +41,69 @@ $echbay_cookie_name = 'eb_' . md5($_SERVER['HTTP_HOST']) . '_access_token';
 // TEST
 // print_r($_SERVER);
 
-// Nếu đã có cookie truy cập thì cũng cho phép
-if (isset($_COOKIE[$echbay_cookie_name])) {
-    $echbay_allowed = __LINE__;
-}
-// Nếu nguồn giới thiệu là từ hệ thống của echbay
-else if (
-    isset($_SERVER['HTTP_REFERER']) &&
-    (
-        strpos($_SERVER['HTTP_REFERER'], 'echbay.com') !== false ||
-        strpos($_SERVER['HTTP_REFERER'], 'cloud.echbay.com') !== false
-    )
-) {
-    // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
-    setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
-    $echbay_allowed = __LINE__;
-}
-// nếu có cookie của wordpress thì cũng cho phép
-else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'wordpress_logged_in_') !== false) {
-    $wp_load_php = '../wp-load.php';
-    if (is_file($wp_load_php)) {
-        include_once $wp_load_php;
-        // lấy thông tin user hiện tại
-        $current_user = wp_get_current_user();
-        // print_r($current_user);
-        // nếu user hiện tại có quyền quản trị -> cho phép
-        if (in_array('administrator', $current_user->roles)) {
-            // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
-            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
-            // $echbay_allowed = __LINE__;
-            // tải lại trang để tránh bị lặp lại đoạn code trên
-            header("Location: " . $_SERVER['REQUEST_URI']);
-        }
-        echo 'Permission denied by wordpress!';
-        exit;
+// tạm bỏ qua tính năng này
+if (1 > 2) {
+    // Nếu đã có cookie truy cập thì cũng cho phép
+    if (isset($_COOKIE[$echbay_cookie_name])) {
+        $echbay_allowed = __LINE__;
     }
-}
-// nếu là phương thức POST
-else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (
-        isset($_POST['from']) &&
-        isset($_POST['to']) &&
+    // Nếu nguồn giới thiệu là từ hệ thống của echbay
+    else if (
+        isset($_SERVER['HTTP_REFERER']) &&
         (
-            $_POST['from'] == 'echbay.com' ||
-            $_POST['from'] == 'cloud.echbay.com'
-        ) &&
-        $_POST['to'] == $_SERVER['HTTP_HOST']
+            strpos($_SERVER['HTTP_REFERER'], 'echbay.com') !== false ||
+            strpos($_SERVER['HTTP_REFERER'], 'cloud.echbay.com') !== false
+        )
     ) {
         // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
         setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
         $echbay_allowed = __LINE__;
-        // die(__FILE__ . ':' . __LINE__);
     }
-}
+    // nếu có cookie của wordpress thì cũng cho phép
+    else if (1 > 2 && isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'wordpress_logged_in_') !== false) {
+        $wp_load_php = '../wp-load.php';
+        if (is_file($wp_load_php)) {
+            include_once $wp_load_php;
+            // lấy thông tin user hiện tại
+            $current_user = wp_get_current_user();
+            // print_r($current_user);
+            // nếu user hiện tại có quyền quản trị -> cho phép
+            if (in_array('administrator', $current_user->roles)) {
+                // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
+                setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+                // $echbay_allowed = __LINE__;
+                // tải lại trang để tránh bị lặp lại đoạn code trên
+                header("Location: " . $_SERVER['REQUEST_URI']);
+            }
+            echo 'Permission denied by wordpress!';
+            exit;
+        }
+    }
+    // nếu là phương thức POST
+    else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (
+            isset($_POST['from']) &&
+            isset($_POST['to']) &&
+            (
+                $_POST['from'] == 'echbay.com' ||
+                $_POST['from'] == 'cloud.echbay.com'
+            ) &&
+            $_POST['to'] == $_SERVER['HTTP_HOST']
+        ) {
+            // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
+            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+            $echbay_allowed = __LINE__;
+            // die(__FILE__ . ':' . __LINE__);
+        }
+    }
 
-if ($echbay_allowed < 1) {
-    // header('HTTP/1.1 403 Forbidden');
-    exit('Permission denied by cloud echbay!');
-    // } else {
-    //     print_r($_SERVER);
-    //     die(__FILE__ . ':' . __LINE__);
+    if ($echbay_allowed < 1) {
+        // header('HTTP/1.1 403 Forbidden');
+        exit('Permission denied by cloud echbay!');
+        // } else {
+        //     print_r($_SERVER);
+        //     die(__FILE__ . ':' . __LINE__);
+    }
 }
 
 // Auth with login/password
