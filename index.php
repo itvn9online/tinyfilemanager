@@ -99,15 +99,28 @@ else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($echbay_allowed < 1) {
     // header('HTTP/1.1 403 Forbidden');
+
     // nếu là wordpress thì yêu cầu đăng nhập
     if (is_file('../wp-load.php')) {
-        exit('Please login to admin WordPress to access this page!');
+        // echo 'Please login to admin WordPress to access this page!';
+
+        // redirect tới trang login của wordpress, đăng nhập xong quay lại trang hiện tại
+        $current_url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $wp_base_path = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
+        $wp_login_url = $wp_base_path . '/wp-login.php?redirect_to=' . urlencode($current_url);
+        if (!headers_sent()) {
+            header('Location: ' . $wp_login_url);
+        } else {
+            echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($wp_login_url, ENT_QUOTES) . '">';
+        }
     }
     // nếu không phải wordpress thì báo lỗi liên quan tới bên echbay
-    exit('Permission denied by cloud echbay!');
-    // } else {
-    //     print_r($_SERVER);
-    //     die(__FILE__ . ':' . __LINE__);
+    else {
+        echo 'Permission denied by cloud echbay!';
+    }
+    // print_r($_SERVER);
+    // die(__FILE__ . ':' . __LINE__);
+    exit;
 }
 // }
 
