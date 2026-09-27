@@ -37,6 +37,19 @@ define('APP_TITLE', 'Tiny File Manager');
 // Kiểm tra và tạo cookie truy cập
 $echbay_allowed = 0;
 $echbay_cookie_name = 'eb_' . md5($_SERVER['HTTP_HOST']) . '_access_token';
+$echbay_cookie_options = array(
+    // thời điểm hết hạn (timestamp): 1 ngày = 86_400, 12 tiếng = 43_200
+    'expires' => time() + 43_200,
+    // cookie có hiệu lực cho toàn bộ domain, không chỉ thư mục hiện tại
+    'path' => '/',
+    // chỉ gửi cookie qua HTTPS, truy cập bằng HTTP thì trình duyệt không lưu/gửi
+    'secure' => true,
+    // JS phía trình duyệt (document.cookie) không đọc/ghi được, chỉ server dùng
+    'httponly' => true,
+    // không gửi cookie khi request đến từ site khác (form POST, iframe, ajax...),
+    // chỉ gửi khi người dùng bấm link điều hướng trực tiếp tới trang
+    'samesite' => 'Lax',
+);
 
 // TEST
 // print_r($_SERVER);
@@ -56,7 +69,7 @@ else if (
     )
 ) {
     // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
-    setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+    setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), $echbay_cookie_options);
     $echbay_allowed = __LINE__;
 }
 // nếu có cookie của wordpress thì cũng cho phép
@@ -70,7 +83,7 @@ else if (isset($_SERVER['HTTP_COOKIE']) && strpos($_SERVER['HTTP_COOKIE'], 'word
         // nếu user hiện tại có quyền quản trị -> cho phép
         if (in_array('administrator', $current_user->roles)) {
             // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
-            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+            setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), $echbay_cookie_options);
             // $echbay_allowed = __LINE__;
             // tải lại trang để tránh bị lặp lại đoạn code trên
             header("Location: " . $_SERVER['REQUEST_URI']);
@@ -91,7 +104,7 @@ else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_POST['to'] == $_SERVER['HTTP_HOST']
     ) {
         // Tạo khóa truy cập và lưu vào cookie: 1 ngày = 86_400, 12 tiếng = 43_200
-        setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), time() + 43_200, "/");
+        setcookie($echbay_cookie_name, md5(uniqid('echbay_', true)), $echbay_cookie_options);
         $echbay_allowed = __LINE__;
         // die(__FILE__ . ':' . __LINE__);
     }
